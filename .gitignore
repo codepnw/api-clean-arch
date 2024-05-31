@@ -12,3 +12,5 @@ go.work
 
 *.log
 .idea
+config.yml
+test-api.http

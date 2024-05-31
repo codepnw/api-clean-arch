@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -12,8 +11,6 @@ import (
 
 	"github.com/codepnw/api-clean-arch/internal/config"
 	"github.com/codepnw/api-clean-arch/internal/user"
-	"github.com/codepnw/api-clean-arch/internal/user/db"
-	"github.com/codepnw/api-clean-arch/pkg/client/mongodb"
 	"github.com/codepnw/api-clean-arch/pkg/logging"
 	"github.com/julienschmidt/httprouter"
 )
@@ -24,66 +21,13 @@ func main() {
 	router := httprouter.New()
 
 	cfg := config.GetConfig()
-	cfgMongo := cfg.MongoDB
-
-	mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port, cfgMongo.Username, cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
-	if err != nil {
-		panic(err)
-	}
-
-	storage := db.NewStorage(mongoDBClient, cfg.MongoDB.Collection, logger)
-
-	// Start Debug User
-	users, err := storage.FindAll(context.Background())
-	fmt.Println(users)
-
-	user1 := user.User{
-		ID:           "",
-		Email:        "user1@mail.com",
-		Username:     "myuser1",
-		PasswordHash: "123123d",
-	}
-
-	user1ID, err := storage.Create(context.Background(), user1)
-	if err != nil {
-		panic(err)
-	}
-	logger.Info(user1ID)
-
-	user2 := user.User{
-		ID:           "",
-		Email:        "user2@mail.com",
-		Username:     "user2",
-		PasswordHash: "123123",
-	}
-	user2ID, err := storage.Create(context.Background(), user2)
-	if err != nil {
-		panic(err)
-	}
-	logger.Info(user2ID)
-
-	user2Found, err := storage.FindOne(context.Background(), user2ID)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(user2Found)
-
-	user2Found.Email = "newmailuser2@mail.com"
-	err = storage.Update(context.Background(), user2Found)
-	if err != nil {
-		panic(err)
-	}
-
-	err = storage.Delete(context.Background(), user2ID)
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = storage.FindOne(context.Background(), user2ID)
-	if err == nil {
-		panic(err)
-	}
-	// End Debug User
+	//cfgMongo := cfg.MongoDB
+	//
+	//mongoDBClient, err := mongodb.NewClient(context.Background(), cfgMongo.Host, cfgMongo.Port, cfgMongo.Username, cfgMongo.Password, cfgMongo.Database, cfgMongo.AuthDB)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//storage := db.NewStorage(mongoDBClient, cfg.MongoDB.Collection, logger)
 
 	handler := user.NewHandler(logger)
 	handler.Register(router)
